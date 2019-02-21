@@ -438,6 +438,7 @@ define LINUX_BUILD_CMDS
 	@if grep -q "CONFIG_MODULES=y" $(@D)/.config; then \
 		$(LINUX_MAKE_ENV) $(MAKE) $(LINUX_MAKE_FLAGS) -C $(@D) modules ; \
 	fi
+	$(LINUX_MAKE_ENV) $(MAKE) $(LINUX_MAKE_FLAGS) -C $(@D) dtbs
 	$(LINUX_BUILD_DTB)
 	$(LINUX_APPEND_DTB)
 endef
@@ -475,6 +476,7 @@ endef
 define LINUX_INSTALL_IMAGES_CMDS
 	$(call LINUX_INSTALL_IMAGE,$(BINARIES_DIR))
 	$(call LINUX_INSTALL_DTB,$(BINARIES_DIR))
+	$(LINUX_MAKE_ENV) $(MAKE1) $(LINUX_MAKE_FLAGS) INSTALL_DTBS_PATH=$(BINARIES_DIR) -C $(@D) dtbs_install;
 endef
 
 ifeq ($(BR2_STRIP_strip),y)
