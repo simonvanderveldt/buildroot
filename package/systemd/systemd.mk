@@ -168,7 +168,9 @@ endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_JOURNAL_GATEWAY),y)
 SYSTEMD_DEPENDENCIES += libmicrohttpd
-SYSTEMD_CONF_OPTS += -Dmicrohttpd=true
+SYSTEMD_CONF_OPTS += -Dremote=true -Dmicrohttpd=true
+SYSTEMD_JOURNAL_GATEWAY_USER = systemd-journal-gateway -1 systemd-journal-gateway -1 * /var/log/journal - - Journal Gateway
+SYSTEMD_JOURNAL_REMOTE_USER = systemd-journal-remote -1 systemd-journal-remote -1 * /var/log/journal/remote - - Journal Remote
 ifeq ($(BR2_PACKAGE_LIBQRENCODE),y)
 SYSTEMD_CONF_OPTS += -Dqrencode=true
 SYSTEMD_DEPENDENCIES += libqrencode
@@ -176,7 +178,7 @@ else
 SYSTEMD_CONF_OPTS += -Dqrencode=false
 endif
 else
-SYSTEMD_CONF_OPTS += -Dmicrohttpd=false -Dqrencode=false
+SYSTEMD_CONF_OPTS += -Dremote=false -Dmicrohttpd=false -Dqrencode=false 
 endif
 
 ifeq ($(BR2_PACKAGE_LIBSELINUX),y)
@@ -382,9 +384,9 @@ define SYSTEMD_USERS
 	- - render -1 * - - - DRI rendering nodes
 	- - kvm -1 * - - - kvm nodes
 	systemd-bus-proxy -1 systemd-bus-proxy -1 * - - - Proxy D-Bus messages to/from a bus
-	systemd-journal-gateway -1 systemd-journal-gateway -1 * /var/log/journal - - Journal Gateway
-	systemd-journal-remote -1 systemd-journal-remote -1 * /var/log/journal/remote - - Journal Remote
 	systemd-journal-upload -1 systemd-journal-upload -1 * - - - Journal Upload
+	$(SYSTEMD_JOURNAL_GATEWAY_USER)
+	$(SYSTEMD_JOURNAL_REMOTE_USER)
 	$(SYSTEMD_COREDUMP_USER)
 	$(SYSTEMD_NETWORKD_USER)
 	$(SYSTEMD_RESOLVED_USER)
